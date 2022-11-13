@@ -13,29 +13,28 @@ function start() {
   if (timeout) clearTimeout(timeout)
   requestAnimationFrame(function anime() {
     g.clearRect(0, 0, 1500, 1500)
-    g.strokeStyle = '#000000'
-    if (points.length) {
-      points.reduce((last, p) => {
-        g.beginPath()
-        g.moveTo(last.real, last.imagine)
-        g.lineTo(p.real, p.imagine)
-        g.stroke()
-        return p
-      })
-    }
     const last = circles.reduce(({ real: x, imagine: y }, [r, v, cos]) => {
       const angle = cos + v * time
       const nextX = x + r * Math.cos(angle)
       const nextY = y + r * Math.sin(angle)
-      g.strokeStyle = '#00000033'
+      g.strokeStyle = '#1D1D1D'
       g.beginPath()
       g.arc(x, y, Math.abs(r), 0, 2 * Math.PI)
       g.stroke()
       return { real: nextX, imagine: nextY }
     }, { real: 0, imagine: document.body.clientHeight / 2 })
     points.push(last)
+    g.strokeStyle = '#FFFF33'
+    points.reduce((last, p) => {
+      g.lineWidth = 2
+      g.beginPath()
+      g.moveTo(last.real, last.imagine)
+      g.lineTo(p.real, p.imagine)
+      g.stroke()
+      return p
+    })
     time++
-    if (time <= document.body.clientWidth) {
+    if (time < document.body.clientWidth) {
       timeout = setTimeout(anime, 1000 / 120)
     }
   })
