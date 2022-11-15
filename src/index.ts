@@ -1,5 +1,6 @@
-import { dft } from './fourier'
-import { data } from './data'
+import { canny, Complex, dft, gray, gussian, nonMaxSuppression, sobel } from './algorithm'
+import { data, loadData } from './data'
+import { loadImage } from './utils'
 
 const canvas: HTMLCanvasElement = document.querySelector('#main')
 const g = canvas.getContext('2d')
@@ -11,7 +12,7 @@ function start() {
   const points = []
   let time = 0
   if (timeout) clearTimeout(timeout)
-  requestAnimationFrame(function anime() {
+  requestAnimationFrame(async function anime() {
     g.clearRect(0, 0, 1500, 1500)
     const last = circles.reduce(({ real: x, imagine: y }, [r, v, cos]) => {
       const angle = cos + v * time
@@ -33,6 +34,16 @@ function start() {
       g.stroke()
       return p
     })
+
+    // const image = canny(await loadImage('l6.png'))
+    
+    // g.fillStyle = '#FFFFFF'
+    // image.forEach((y, j) => y.forEach((x, i) => {
+    //   if (x) {
+    //     g.fillRect(i / 3 + 100, j / 3 + 100, 1 / 2, 1 / 2)
+    //     // g.fillRect(i, j, 1, 1)
+    //   }
+    // }))
     time++
     if (time < document.body.clientWidth) {
       timeout = setTimeout(anime, 1000 / 120)
@@ -40,10 +51,10 @@ function start() {
   })
 }
 
+let fs: Complex[]
 function resize() {
   canvas.width = document.body.clientWidth
   canvas.height = document.body.clientHeight
-  const fs = dft(data)
   circles = fs.flatMap((f, i) => {
     const v = 2 * Math.PI * i / fs.length
     return [
@@ -54,5 +65,9 @@ function resize() {
   circles.sort((x, y) => Math.abs(y[0]) - Math.abs(x[0]))
   start()
 }
-window.onresize = resize
-resize()
+
+;(async () => {
+  fs = dft(await loadData())
+  window.onresize = resize
+  resize()
+})()

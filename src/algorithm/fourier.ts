@@ -1,7 +1,4 @@
-export interface Complex {
-  real: number
-  imagine: number
-}
+import { Complex } from '.'
 
 export function dft(inputs: Complex[]): Complex[] {
   const count = inputs.length

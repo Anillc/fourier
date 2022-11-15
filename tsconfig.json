@@ -3,12 +3,12 @@
     "baseUrl": ".",
     "rootDir": "src",
     "target": "ESNext",
-    "module": "UMD",
     "declaration": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "outDir": "lib",
     "strictNullChecks": false,
+    "resolveJsonModule": true,
   },
   "include": [
     "src",
