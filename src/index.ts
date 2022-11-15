@@ -1,13 +1,44 @@
-import { canny, Complex, dft, gray, gussian, nonMaxSuppression, sobel } from './algorithm'
-import { data, loadData } from './data'
+import { Complex, dft, Pixel } from './algorithm'
+import { loadData } from './data'
 import { loadImage } from './utils'
+
+const size = 1600
+let image: Pixel[][]
 
 const canvas: HTMLCanvasElement = document.querySelector('#main')
 const g = canvas.getContext('2d')
 
 let circles: [number, number, number][]
-
 let timeout: number = null
+
+let fs: Complex[]
+function resize() {
+  canvas.width = document.body.clientWidth
+  canvas.height = document.body.clientHeight
+  circles = fs.flatMap((f, i) => {
+    const v = 2 * Math.PI * i / fs.length
+    return [
+      [f.real    / fs.length, v, 0],
+      [f.imagine / fs.length, v, Math.PI / 2],
+    ]
+  })
+  circles.sort((x, y) => Math.abs(y[0]) - Math.abs(x[0]))
+  start()
+}
+
+;(async () => {
+  image = await loadImage('1.jpg')
+  const data = loadData(image)
+  const resized = []
+  const step = data.length / size
+  for (let i = 0; i < size; i++) {
+    resized.push(data[Math.floor(step * i)])
+  }
+  fs = dft(resized)
+  window.onresize = resize
+  resize()
+})()
+
 function start() {
   const points = []
   let time = 0
@@ -23,7 +54,7 @@ function start() {
       g.arc(x, y, Math.abs(r), 0, 2 * Math.PI)
       g.stroke()
       return { real: nextX, imagine: nextY }
-    }, { real: 0, imagine: document.body.clientHeight / 2 })
+    }, { real: Math.abs((document.body.clientWidth - image[0].length) / 2), imagine: 0 })
     points.push(last)
     g.strokeStyle = '#FFFF33'
     points.reduce((last, p) => {
@@ -35,39 +66,9 @@ function start() {
       return p
     })
 
-    // const image = canny(await loadImage('l6.png'))
-    
-    // g.fillStyle = '#FFFFFF'
-    // image.forEach((y, j) => y.forEach((x, i) => {
-    //   if (x) {
-    //     g.fillRect(i / 3 + 100, j / 3 + 100, 1 / 2, 1 / 2)
-    //     // g.fillRect(i, j, 1, 1)
-    //   }
-    // }))
     time++
-    if (time < document.body.clientWidth) {
+    if (time < size) {
       timeout = setTimeout(anime, 1000 / 120)
     }
   })
 }
-
-let fs: Complex[]
-function resize() {
-  canvas.width = document.body.clientWidth
-  canvas.height = document.body.clientHeight
-  circles = fs.flatMap((f, i) => {
-    const v = 2 * Math.PI * i / fs.length
-    return [
-      [f.real    / fs.length, v, -Math.PI / 2],
-      [f.imagine / fs.length, v, 0],
-    ]
-  })
-  circles.sort((x, y) => Math.abs(y[0]) - Math.abs(x[0]))
-  start()
-}
-
-;(async () => {
-  fs = dft(await loadData())
-  window.onresize = resize
-  resize()
-})()

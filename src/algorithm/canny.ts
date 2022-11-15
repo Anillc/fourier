@@ -89,6 +89,7 @@ export function nonMaxSuppression(input: number[][]) {
       } else {
         return 0
       }
+      if (x === 0 || y === 0 || x === row.length - 1 || y === input.length) return 0
       const [aX, aY] = gxys[y + y1]?.[x + x1] || [0, 0]
       const [bX, bY] = gxys[y + y2]?.[x + x2] || [0, 0]
       const [cX, cY] = gxys[y - y1]?.[x - x1] || [0, 0]
