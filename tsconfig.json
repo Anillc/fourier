@@ -9,6 +9,7 @@
     "outDir": "lib",
     "strictNullChecks": false,
     "resolveJsonModule": true,
+    "module": "ESNext",
   },
   "include": [
     "src",

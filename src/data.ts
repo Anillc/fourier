@@ -1,9 +1,9 @@
 import { canny, prim, Complex, Pixel } from './algorithm'
 
-export function loadData(input: Pixel[][]): Complex[] {
+export function loadData(input: Pixel[][], scale = 1): Complex[] {
   const image = canny(input)
   const pixels: Complex[] = image.map((row, imagine) => row.map((pixel, real) => {
-    return pixel ? [{ real, imagine }] : []
+    return pixel ? [{ real: real * scale, imagine: imagine * scale }] : []
   })).flat(2)
   const treeMap = prim(pixels.map(a => pixels.map(b => {
     return Math.sqrt((a.real - b.real) ** 2 + (a.imagine - b.imagine) ** 2)

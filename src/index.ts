@@ -1,13 +1,11 @@
-import { Complex, dft, Pixel } from './algorithm'
+import { Complex, dft } from './algorithm'
 import { loadData } from './data'
 import { loadImage } from './utils'
-
-const size = 1600
-let image: Pixel[][]
 
 const canvas: HTMLCanvasElement = document.querySelector('#main')
 const g = canvas.getContext('2d')
 
+let imageSize: Complex
 let circles: [number, number, number][]
 let timeout: number = null
 
@@ -27,8 +25,15 @@ function resize() {
 }
 
 ;(async () => {
-  image = await loadImage('1.jpg')
-  const data = loadData(image)
+  const body = document.body
+  const scale = body.clientHeight > body.clientWidth ? 0.5 : 1
+  const size = 1700
+  const image = await loadImage(new URL('kano.jpg', import.meta.url).toString())
+  const data = loadData(image, scale)
+  imageSize = {
+    real: image[0].length * scale,
+    imagine: image.length * scale,
+  }
   const resized = []
   const step = data.length / size
   for (let i = 0; i < size; i++) {
@@ -54,7 +59,10 @@ function start() {
       g.arc(x, y, Math.abs(r), 0, 2 * Math.PI)
       g.stroke()
       return { real: nextX, imagine: nextY }
-    }, { real: Math.abs((document.body.clientWidth - image[0].length) / 2), imagine: 0 })
+    }, {
+      real: Math.abs(document.body.clientWidth - imageSize.real) / 2,
+      imagine: Math.abs(document.body.clientHeight - imageSize.imagine) / 2
+    })
     points.push(last)
     g.strokeStyle = '#FFFF33'
     points.reduce((last, p) => {
@@ -67,7 +75,7 @@ function start() {
     })
 
     time++
-    if (time < size) {
+    if (time < fs.length) {
       timeout = setTimeout(anime, 1000 / 120)
     }
   })
