@@ -11,4 +11,4 @@ export interface Pixel {
 
 export * from './fourier'
 export * from './canny'
-export * from './kruskal'
+export * from './prim'

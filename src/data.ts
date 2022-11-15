@@ -1,4 +1,4 @@
-import { canny, Complex } from './algorithm'
+import { canny, prim, Complex } from './algorithm'
 import { loadImage } from './utils'
 
 const scaleX = 10
@@ -30,4 +30,17 @@ export async function loadData() {
     })
   })
   return data
+}
+
+export async function points(url: string): Promise<Complex[]> {
+  const image = canny(await loadImage('3.jpg'))
+  const pixels: Complex[] = image.map((row, imagine) => row.map((pixel, real) => pixel ? [{
+    real, imagine
+  }] : [])).flat(2)
+  const map = pixels.map(a => pixels.map(b => {
+    return Math.sqrt((a.real - b.real) ** 2 + (a.imagine - b.imagine) ** 2)
+  }))
+  const treeMap = prim(map)
+    
+  return []
 }
